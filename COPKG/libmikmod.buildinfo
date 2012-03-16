@@ -1,0 +1,50 @@
+@import "version.inc";
+
+#product-info  {
+    product-name: "libmikmod";
+    version: "3.11.1";
+    original-source-location: "http://mikmod.raphnet.net/files/libmikmod-3.1.11.tar.gz";
+    original-source-website: "http://mikmod.raphnet.net/#files";
+    license: "LGPL 2+";
+    packager: "Vincent Povirk <madewokherd@gmail.com>";
+}
+
+common-build {
+    compiler: "${compiler}";
+    platform: "${platform}";
+
+    default: false;
+    
+    targets: { 
+                @"image-${platform}-${compiler}\mikmod.dll",
+                @"image-${platform}-${compiler}\mikmod.lib",
+                @"image-${platform}-${compiler}\mikmod.pdb",
+            } ;
+ 
+    build-command: @"
+			mkdir image-${platform}-${compiler}
+            pushd win32
+            nmake -f Makefile.dynamic DLLNAME=..\image-${platform}-${compiler}\mikmod.dll LIBNAME=..\image-${platform}-${compiler}\mikmod.lib
+			erase *.o
+			move *.pdb ..\image-${platform}-${compiler}\mikmod.pdb
+            popd
+            ";
+
+    clean-command: @"
+            erase win32\*.o
+            del /Q /S image-${platform}-${compiler}
+            ";
+}
+
+x86 {
+    set: {
+        compiler="vc10";
+        platform="x86";
+    };
+
+    uses: common-build;
+}
+
+release {
+    uses: {x86};
+}
