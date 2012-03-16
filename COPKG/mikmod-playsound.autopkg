@@ -1,0 +1,95 @@
+@import "version.inc";
+@import "outercurve.inc";
+
+#define { 
+    flavor: "${flav??vc10}"; 
+    arch : "${arc??x86}";
+}
+
+package {
+    name: "mikmod-playsound[${flavor}]";
+    version: "${package-version}";
+    arch : "${arch}";
+    
+    display-name: "Mikmod test program";
+    location: "http://coapp.org/repository/${OutputFilename}";
+
+    feed: "http://coapp.org/repository/packages.atom.xml";
+    publisher: "CoApp Project";
+}
+
+metadata {
+    summary: "Mikmod audio module library test program";
+    description: @"Mikmod is a module player and library supporting many formats, including mod, s3m, it, and xm. This package installs a program called mikmod-playsound.exe that plays a tracker file using the Mikmod library.";
+    
+    author-version : "${author-version}";
+    bug-tracker: "https://github.com/coapp-packages/libmikmod/issues";
+    stability : "0";
+    licenses : {
+        "lgpl2+"
+    };
+}
+
+license[lgpl2+] {
+    license-url: "http://www.gnu.org/licenses/lgpl-2.1.html";
+    license-type: "lgpl";
+}
+
+files[exes] {
+    root: @"..\image-${arch}-${flavor}\";
+  
+    include: {
+        "mikmod-playsound.exe",
+    };
+    
+    trim-path: all;
+};
+
+files[files-to-sign] {
+    include: { 
+        exes
+    };    
+}
+
+application {
+    include : {
+        exes
+    };
+}
+
+manifest[things-that-need-them] {
+    // all of our EXEs need to get the manifest entries for the assemblies we're creating in this package
+    
+    assembly : {
+        libmikmod
+    };
+    
+    include : { 
+        exes
+    };
+}
+
+package-composition {
+    symlinks : { 
+        exes => @"${bin}\${each.Name}" = @"${packagedir}\${each.Name}";
+    };
+}
+
+requires {
+    package: "libmikmod[${flavor}]-${package-version}-${Package.Architecture}-${Package.PublicKeyToken}";
+}
+
+signing {
+    attributes : {
+        company="Outercurve Foundation",
+        description="${Package.PackageDetails.SummaryDescription}",
+        product-name="libmikmod",
+        product-version="${package-version}",
+        file-version="${package-version}",
+    };
+    
+    replace-signature: true; 
+    include: { 
+        files-to-sign
+    };    
+}

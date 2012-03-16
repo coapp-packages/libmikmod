@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
     MODULE *module;
 	char *filename;
 	int test;
+	int result=0;
 
 	if (!argv[1])
 	{
@@ -52,7 +53,7 @@ int main(int argc, char *argv[])
     if (MikMod_Init("")) {
         fprintf(stderr, "Could not initialize sound, reason: %s\n",
                 MikMod_strerror(MikMod_errno));
-        return;
+        return 1;
     }
 
 	if (test)
@@ -75,9 +76,11 @@ int main(int argc, char *argv[])
 
         Player_Stop();
         Player_Free(module);
-    } else
+    } else {
         fprintf(stderr, "Could not load module, reason: %s\n",
                 MikMod_strerror(MikMod_errno));
+		return 1;
+	}
 
 	/* Just so we know everything is OK when testing */
 	printf("Finished playing %s\n", filename);

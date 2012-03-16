@@ -30,11 +30,15 @@ common-build {
 			move *.pdb ..\image-${platform}-${compiler}\mikmod.pdb
 			copy mikmod_build.h ..\image-${platform}-${compiler}\mikmod.h
             popd
+            msbuild /p:Platform=Win32 /p:Configuration=Release COPKG\test\mikmod-playsound\mikmod-playsound.sln
+			copy COPKG\test\mikmod-playsound\Release\mikmod-playsound.exe image-${platform}-${compiler}
+            msbuild /p:Platform=Win32 /p:Configuration=Release /target:Clean COPKG\test\mikmod-playsound\mikmod-playsound.sln
             ";
 
     clean-command: @"
             erase win32\*.o
             del /Q /S image-${platform}-${compiler}
+            msbuild /p:Platform=Win32 /p:Configuration=Release /target:Clean COPKG\test\mikmod-playsound\mikmod-playsound.sln
             ";
 }
 
@@ -58,14 +62,11 @@ common-test {
     default: false;
  
     build-command: @"
-			msbuild /p:Platform=Win32 /p:Configuration=Release COPKG\test\mikmod-playsound\mikmod-playsound.sln
-			set PATH=%PATH%;%CD%\image-${platform}-${compiler}
-			COPKG\test\mikmod-playsound\Release\mikmod-playsound -t COPKG\test\bb.s3m || goto failed
-			msbuild /p:Platform=Win32 /p:Configuration=Release /target:Clean COPKG\test\mikmod-playsound\mikmod-playsound.sln
+			cd image-${platform}-${compiler}
+			mikmod-playsound -t ..\COPKG\test\bb.s3m || goto failed
             ";
 
     clean-command: @"
-            msbuild /p:Platform=Win32 /p:Configuration=Release /target:Clean COPKG\test\mikmod-playsound\mikmod-playsound.sln
             ";
 }
 
@@ -91,6 +92,7 @@ package {
         @"copkg\libmikmod-dev-common-${package-version}-any.msi",
         @"copkg\libmikmod[vc10]-${package-version}-x86.msi",
         @"copkg\libmikmod-dev[vc10]-${package-version}-x86.msi",
+        @"copkg\mikmod-playsound[vc10]-${package-version}-x86.msi",
     };
     
     build-command : @"
@@ -100,6 +102,7 @@ package {
         for %%A in (${ALL_COMPILERS}) do (
             autopackage --flav=%%A --arc=x86 libmikmod.autopkg || goto failed
             coapp --force-scan list >NUL
+            autopackage --flav=%%A --arc=x86 mikmod-playsound.autopkg || goto failed
             autopackage --flav=%%A --arc=x86 libmikmod-dev.autopkg || goto failed
         )
         coapp remove-feed ""%cd%""
