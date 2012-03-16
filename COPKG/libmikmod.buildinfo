@@ -90,6 +90,7 @@ package {
     targets: { 
         @"copkg\libmikmod-dev-common-${package-version}-any.msi",
         @"copkg\libmikmod[vc10]-${package-version}-x86.msi",
+        @"copkg\libmikmod-dev[vc10]-${package-version}-x86.msi",
     };
     
     build-command : @"
