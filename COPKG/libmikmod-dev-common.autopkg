@@ -1,0 +1,28 @@
+@import "version.inc" ;
+@import "outercurve.inc" ;
+@import "metadata.inc";
+
+package {
+    name: "libmikmod-dev-common";
+    version: "${package-version}";
+    arch: any;
+    display-name: "Mikmod dev library-common";
+}
+
+/* FIXME: Use mingw to generate mikmod.h */
+files[headers] {
+    root: @"..\image-x86-vc10";
+    include: {
+        "mikmod.h"
+    };
+    
+    trim-path:all;
+    
+    destination-path:"include";
+}
+
+developer-library[libmikmod] {
+    headers: { 
+        headers
+    };
+}

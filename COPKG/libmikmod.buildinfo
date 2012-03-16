@@ -19,6 +19,7 @@ common-build {
                 @"image-${platform}-${compiler}\mikmod.dll",
                 @"image-${platform}-${compiler}\mikmod.lib",
                 @"image-${platform}-${compiler}\mikmod.pdb",
+                @"image-${platform}-${compiler}\mikmod.h",
             } ;
  
     build-command: @"
@@ -27,6 +28,7 @@ common-build {
             nmake -f Makefile.dynamic DLLNAME=..\image-${platform}-${compiler}\mikmod.dll LIBNAME=..\image-${platform}-${compiler}\mikmod.lib
 			erase *.o
 			move *.pdb ..\image-${platform}-${compiler}\mikmod.pdb
+			copy mikmod_build.h ..\image-${platform}-${compiler}\mikmod.h
             popd
             ";
 
@@ -57,12 +59,14 @@ package {
     
     // In future versions of pTk, we hope to be able to make this list more concise and maliable.
     targets: { 
+        @"copkg\libmikmod-dev-common-${package-version}-any.msi",
         @"copkg\libmikmod[vc10]-${package-version}-x86.msi",
     };
     
     build-command : @"
         cd COPKG
         coapp add-feed ""%cd%""
+		autopackage libmikmod-dev-common.autopkg || goto failed
         for %%A in (${ALL_COMPILERS}) do (
             coapp --force-scan list >NUL
             autopackage --flav=%%A --arc=x86 libmikmod.autopkg || goto failed
