@@ -2,7 +2,7 @@
 
 #product-info  {
     product-name: "libmikmod";
-    version: "3.11.1";
+    version: "${author-version}";
     original-source-location: "http://mikmod.raphnet.net/files/libmikmod-3.1.11.tar.gz";
     original-source-website: "http://mikmod.raphnet.net/#files";
     license: "LGPL 2+";
@@ -47,4 +47,31 @@ x86 {
 
 release {
     uses: {x86};
+}
+
+/* No test target because libmikmod source doesn't include any tests or executables. */
+
+package {
+    set : ALL_COMPILERS="${ALL_COMPILERS??vc10}"; // suggested full list = "vc10 vc9 vc8 vc7.1 vc6 mingw";
+    default : false;
+    
+    // In future versions of pTk, we hope to be able to make this list more concise and maliable.
+    targets: { 
+        @"copkg\libmikmod[vc10]-${package-version}-x86.msi",
+    };
+    
+    build-command : @"
+        cd COPKG
+        coapp add-feed ""%cd%""
+        for %%A in (${ALL_COMPILERS}) do (
+            coapp --force-scan list >NUL
+            autopackage --flav=%%A --arc=x86 libmikmod.autopkg || goto failed
+        )
+        coapp remove-feed ""%cd%""
+    ";
+
+	clean-command: @"
+		erase COPKG\*.msi
+		erase COPKG\*.wixpdb
+	";
 }

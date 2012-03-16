@@ -1,0 +1,84 @@
+@import "version.inc";
+@import "outercurve.inc";
+
+#define { 
+    flavor: "${flav??vc10}"; 
+    arch : "${arc??x86}";
+}
+
+package {
+    name: "libmikmod[${flavor}]";
+    version: "${package-version}";
+    arch : "${arch}";
+    
+    display-name: "Mikmod library";
+    location: "http://coapp.org/repository/${OutputFilename}";
+
+    feed: "http://coapp.org/repository/packages.atom.xml";
+    publisher: "CoApp Project";
+}
+
+files[dlls] {
+    root: @"..\image-${arch}-${flavor}\";
+  
+    include: {
+        "mikmod.dll",
+    };
+    
+    trim-path: all;
+};
+
+license[lgpl2+] {
+    license-url: "http://www.gnu.org/licenses/lgpl-2.1.html";
+    license-type: "lgpl";
+}
+
+files[files-to-sign] {
+    include: { 
+        dlls
+    };    
+}
+
+provides {
+    feature: "audio.mikmod" = "3.11.1";
+}
+
+metadata {
+    summary: "The Mikmod audio module library";
+    description: @"Mikmod is a module player and library supporting many formats, including mod, s3m, it, and xm.";
+    
+    author-version : "${author-version}";
+    bug-tracker: "https://github.com/coapp-packages/libmikmod/issues";
+    stability : "0";
+    licenses : {
+        "lgpl2+"
+    };
+}
+
+compatability-policy {
+    minimum: "3.11.1.0";
+    maximum: "${OneLessThanCurrent}";
+    versions : {
+    };
+}
+
+assembly[libmikmod] {
+    include : {
+        dlls
+    };
+}
+
+signing {
+    attributes : {
+        company="Outercurve Foundation",
+        description="${Package.PackageDetails.SummaryDescription}",
+        product-name="libmikmod",
+        product-version="${package-version}",
+        file-version="${package-version}",
+    };
+    
+    replace-signature: true; 
+    include: { 
+        files-to-sign
+    };    
+}
