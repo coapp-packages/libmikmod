@@ -51,7 +51,36 @@ release {
     uses: {x86};
 }
 
-/* No test target because libmikmod source doesn't include any tests or executables. */
+common-test {
+    compiler: "${compiler}";
+    platform: "${platform}";
+
+    default: false;
+ 
+    build-command: @"
+			msbuild /p:Platform=Win32 /p:Configuration=Release COPKG\test\mikmod-playsound\mikmod-playsound.sln
+			set PATH=%PATH%;%CD%\image-${platform}-${compiler}
+			COPKG\test\mikmod-playsound\Release\mikmod-playsound -t COPKG\test\bb.s3m || goto failed
+			msbuild /p:Platform=Win32 /p:Configuration=Release /target:Clean COPKG\test\mikmod-playsound\mikmod-playsound.sln
+            ";
+
+    clean-command: @"
+            msbuild /p:Platform=Win32 /p:Configuration=Release /target:Clean COPKG\test\mikmod-playsound\mikmod-playsound.sln
+            ";
+}
+
+x86-test {
+    uses: common-test;
+	
+	set: {
+		compiler="vc10";
+		platform="x86";
+	};
+}
+
+test {
+    uses: {x86-test};
+}
 
 package {
     set : ALL_COMPILERS="${ALL_COMPILERS??vc10}"; // suggested full list = "vc10 vc9 vc8 vc7.1 vc6 mingw";
