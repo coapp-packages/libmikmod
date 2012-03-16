@@ -69,6 +69,13 @@ extern MikMod_handler_t _mm_errorhandler;
 
 /*========== Memory allocation */
 
+#ifdef _MSC_VER
+/* work-around for name conflict with MSVC function _mm_malloc */
+#include <malloc.h>
+#undef _mm_malloc
+#undef _mm_free
+#endif
+
 extern void* _mm_malloc(size_t);
 extern void* _mm_calloc(size_t,size_t);
 #define _mm_free(p) do { if (p) free(p); p = NULL; } while(0)
