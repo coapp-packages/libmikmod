@@ -68,8 +68,9 @@ package {
         coapp add-feed ""%cd%""
 		autopackage libmikmod-dev-common.autopkg || goto failed
         for %%A in (${ALL_COMPILERS}) do (
-            coapp --force-scan list >NUL
             autopackage --flav=%%A --arc=x86 libmikmod.autopkg || goto failed
+            coapp --force-scan list >NUL
+            autopackage --flav=%%A --arc=x86 libmikmod-dev.autopkg || goto failed
         )
         coapp remove-feed ""%cd%""
     ";
